@@ -52,7 +52,7 @@ class TestFormat(unittest.TestCase):
         self.assertEqual(
             sorted(networks.keys()), list(self._aggPeriods.keys()),
             'A network should be created for each aggregation period')
-        for year, net in networks.iteritems():
+        for year, net in networks.items():
             self.assertEqual(sorted(net.keys()), sorted(['nodes', 'links']),
                              'Each network should contain "nodes" and "links"'
                              'but %s does not' % year)
@@ -74,7 +74,7 @@ class TestFormat(unittest.TestCase):
         self.assertEqual(sorted(dicts.keys()), list(self._aggVocab.keys()),
                          'A dictionary should be created for each aggregated '
                          'vocabulary')
-        for year, d in dicts.iteritems():
+        for year, d in dicts.items():
             self.assertEqual(len(d), len(self._aggVocab[year]),
                              'Dict should have same number of items as '
                              'aggregated vocabulary but %s does not' % year)

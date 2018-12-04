@@ -73,8 +73,8 @@ def trackWord(terms):
                                )
 
     aggResults, aggMetadata = agg.aggregate(results)
-    print "ResKeys", results.keys()
-    print "AggResKeys", aggResults.keys()
+    print("ResKeys", list(results.keys()))
+    print("AggResKeys", list(aggResults.keys()))
     stream = yearTuplesAsDict(aggResults)
     networks = yearlyNetwork(aggMetadata, aggResults, results, links)
     embedded = doSpaceEmbedding(app.config['vm'], results, aggMetadata)

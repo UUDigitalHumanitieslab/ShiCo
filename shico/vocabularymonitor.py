@@ -55,10 +55,10 @@ class VocabularyMonitor():
 
                 def loader(name): return KeyedVectors.load(name, mmap=mmap)
 
-            print '[%s]: %s' % (sModelName, sModelFile)
+            print('[%s]: %s' % (sModelName, sModelFile))
             self._models[sModelName] = loader(sModelFile)
             if useCache:
-                print '...caching model ', sModelName
+                print('...caching model ', sModelName)
                 self._models[sModelName] = CachedW2VModelEvaluator(
                     self._models[sModelName])
 
@@ -129,7 +129,7 @@ class VocabularyMonitor():
         yLinks = SortedDict()
 
         # Keys are already sorted because we use a SortedDict
-        sortedKeys = self._models.keys()
+        sortedKeys = list(self._models.keys())
 
         # Select starting key
         if (startKey is not None):
@@ -224,7 +224,7 @@ class VocabularyMonitor():
 
         selectedTerms = set(word for word, weight in topTerms)
         links = {seed: _pruned(pairs, selectedTerms)
-                 for seed, pairs in links.iteritems()}
+                 for seed, pairs in links.items()}
         return topTerms, links
 
 

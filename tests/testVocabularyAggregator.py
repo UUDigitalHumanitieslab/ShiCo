@@ -8,29 +8,29 @@ class TestVocabularyAggregation(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self._data = SortedDict({
-            '1950_1959': [(u'bevrijding', 1), (u'wereldoorlog', 1),
-                          (u'oorlogen', 1), (u'burgeroorlog', 1),
-                          (u'oorlof', 1), (u'bevr\xfcding', 1), (u'ooriog', 1),
-                          (u'hongerwinter', 1), (u'oorlogse', 1), ('oorlog', 1)
+            '1950_1959': [('bevrijding', 1), ('wereldoorlog', 1),
+                          ('oorlogen', 1), ('burgeroorlog', 1),
+                          ('oorlof', 1), ('bevr\xfcding', 1), ('ooriog', 1),
+                          ('hongerwinter', 1), ('oorlogse', 1), ('oorlog', 1)
                           ],
-            '1951_1960': [(u'oorlog', 8), (u'bevrijding', 4),
-                          (u'souvereiniteitsoverdracht', 3), (u'oorloe', 3),
-                          (u'ooriogse', 3), (u'bevr\xfcding', 3),
-                          (u'ooriog', 3), (u'oorlogsjaren', 3), (u'corlog', 2),
-                          (u'boerenoorlog', 2)
+            '1951_1960': [('oorlog', 8), ('bevrijding', 4),
+                          ('souvereiniteitsoverdracht', 3), ('oorloe', 3),
+                          ('ooriogse', 3), ('bevr\xfcding', 3),
+                          ('ooriog', 3), ('oorlogsjaren', 3), ('corlog', 2),
+                          ('boerenoorlog', 2)
                           ],
-            '1952_1961': [(u'oorlog', 5), (u'bevrijding', 4),
-                          (u'geboorteplek', 4), (u'bevryding', 4),
-                          (u'herstelperiode', 3), (u'bezettingsjaren', 3),
-                          (u'oorlogse', 3), (u'crisisperiode', 3),
-                          (u'bevr\xfcding', 3), (u'oorlogsjaren', 3)
+            '1952_1961': [('oorlog', 5), ('bevrijding', 4),
+                          ('geboorteplek', 4), ('bevryding', 4),
+                          ('herstelperiode', 3), ('bezettingsjaren', 3),
+                          ('oorlogse', 3), ('crisisperiode', 3),
+                          ('bevr\xfcding', 3), ('oorlogsjaren', 3)
                           ],
-            '1953_1962': [(u'oorlog', 6), (u'bevrijding', 5),
-                          (u'geboorteplek', 4), (u'bevr\xfcding', 4),
-                          (u'souvereiniteitsoverdracht', 3),
-                          (u'bevrijdingsoorlog', 3), (u'bezettingsjaren', 3),
-                          (u'wereldoorlog', 3), (u'oorlogse', 3),
-                          (u'bevryding', 3)
+            '1953_1962': [('oorlog', 6), ('bevrijding', 5),
+                          ('geboorteplek', 4), ('bevr\xfcding', 4),
+                          ('souvereiniteitsoverdracht', 3),
+                          ('bevrijdingsoorlog', 3), ('bezettingsjaren', 3),
+                          ('wereldoorlog', 3), ('oorlogse', 3),
+                          ('bevryding', 3)
                           ],
         })
 
@@ -59,7 +59,7 @@ class TestVocabularyAggregation(unittest.TestCase):
         nWordsPerYear = 5
         agg = shVA(nWordsPerYear=nWordsPerYear)
         aggData, _ = agg.aggregate(self._data)
-        for words in aggData.itervalues():
+        for words in aggData.values():
             self.assertEqual(len(words), nWordsPerYear,
                              'Each year should have %d words ' % nWordsPerYear)
 
@@ -68,22 +68,22 @@ class TestVocabularyAggregation(unittest.TestCase):
         such intervals are longer'''
         agg = shVA(yearsInInterval=1)
         aggData, _ = agg.aggregate(self._data)
-        self.assertEqual(len(aggData.keys()), len(self._data),
+        self.assertEqual(len(list(aggData.keys())), len(self._data),
                          'Should have same number of keys as original data')
 
         agg = shVA(yearsInInterval=2)
         aggData, _ = agg.aggregate(self._data)
-        self.assertEqual(len(aggData.keys()), len(self._data)/2,
+        self.assertEqual(len(list(aggData.keys())), len(self._data)/2,
                          'Should have 1/2 the number of keys as original data')
 
         agg = shVA(yearsInInterval=len(self._data))
         aggData, _ = agg.aggregate(self._data)
-        self.assertEqual(len(aggData.keys()), 1,
+        self.assertEqual(len(list(aggData.keys())), 1,
                          'Should have only 1 key')
 
         agg = shVA(yearsInInterval=2 * len(self._data))
         aggData, _ = agg.aggregate(self._data)
-        self.assertEqual(len(aggData.keys()), 1,
+        self.assertEqual(len(list(aggData.keys())), 1,
                          'Should have only 1 key, containing all years')
 
     def testTimePeriods(self):
@@ -92,13 +92,13 @@ class TestVocabularyAggregation(unittest.TestCase):
         data, times = agg.aggregate(self._data)
         self.assertEqual(len(data), len(times),
                          'Should have same number of keys')
-        self.assertTrue(data.keys() == times.keys(),
+        self.assertTrue(list(data.keys()) == list(times.keys()),
                         'Should be the same keys')
 
         yearsInInterval = 2
         agg = shVA(yearsInInterval=yearsInInterval, yIntervalFreq=1)
         _, times = agg.aggregate(self._data)
-        for year, values in times.iteritems():
+        for year, values in times.items():
             self.assertEqual(len(values), yearsInInterval,
                              'Should have equal number of years in interval '
                              'but %s does not' % year)
@@ -119,7 +119,7 @@ class TestVocabularyAggregation(unittest.TestCase):
             key: {} for key in targetKeys
         })
 
-        actualKeys = SortedList(seedVocabulary.keys())
+        actualKeys = SortedList(list(seedVocabulary.keys()))
         actualIntervals = _arrangeIntervals(seedVocabulary, 3, 1)
         self._doArrangeIntervalsTesting(targetKeys, actualKeys, targetIntervals, actualIntervals, 'Test1')
 
@@ -131,7 +131,7 @@ class TestVocabularyAggregation(unittest.TestCase):
             key: {} for key in targetKeys
         })
 
-        actualKeys = SortedList(seedVocabulary.keys())
+        actualKeys = SortedList(list(seedVocabulary.keys()))
         actualIntervals = _arrangeIntervals(seedVocabulary, 2, 1)
         self._doArrangeIntervalsTesting(targetKeys, actualKeys, targetIntervals, actualIntervals, 'Test1')
 
@@ -151,7 +151,7 @@ class TestVocabularyAggregation(unittest.TestCase):
             key: {} for key in targetKeys
         })
 
-        actualKeys = SortedList(seedVocabulary.keys())
+        actualKeys = SortedList(list(seedVocabulary.keys()))
         actualIntervals = _arrangeIntervals(seedVocabulary, 3, 1)
         self._doArrangeIntervalsTesting(targetKeys, actualKeys, targetIntervals, actualIntervals, 'Test2')
 

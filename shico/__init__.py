@@ -1,8 +1,8 @@
 from .vocabularymonitor import VocabularyMonitor
 from .vocabularyaggregator import VocabularyAggregator
-import format
-import server
-import extras
+from . import format
+from . import server
+from . import extras
 
 __all__ = ['VocabularyMonitor',
            'VocabularyAggregator', 'server', 'format', 'extras']

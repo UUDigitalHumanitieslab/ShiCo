@@ -17,10 +17,10 @@ def yearlyNetwork(aggPeriods, aggResults, results, links):
     '''Build a dictionary of network graph definitions. The key of this
     dictionary are the years and the values are the network definition
     (in the format used by D3).'''
-    seeds = {y: seedResp.keys() for y, seedResp in links.iteritems()}
+    seeds = {y: list(seedResp.keys()) for y, seedResp in links.items()}
 
     networks = {}
-    for year_mu, years in aggPeriods.iteritems():
+    for year_mu, years in aggPeriods.items():
         yResults = {y: results[y] for y in years}
         yLinks = {y: links[y] for y in years}
         ySeeds = {y: seeds[y] for y in years}
@@ -47,7 +47,7 @@ def yearTuplesAsDict(results):
             }
         }
     '''
-    return {year: _tuplesAsDict(vals) for year, vals in results.iteritems()}
+    return {year: _tuplesAsDict(vals) for year, vals in results.items()}
 
 
 def _buildNode(word, counts, seedSet, finalWords):
@@ -82,14 +82,14 @@ def _buildLinks(yLinks, nodeIdx):
     distance)'''
     linkList = []
     # We are not doing anything with the years in yLinks
-    for links in yLinks.values():
-        for seed, results in links.iteritems():
+    for links in list(yLinks.values()):
+        for seed, results in links.items():
             for word, distance in results:
                 # TODO: check seeds present in dict more elegantly
                 if seed in nodeIdx and word in nodeIdx:
                     linkList.append(_buildLink(seed, word, distance, nodeIdx))
                 else:
-                    print 'Seed or word not in index!'
+                    print('Seed or word not in index!')
     return linkList
 
 
@@ -99,7 +99,7 @@ def _buildNodes(wordCounts, seedSet, finalWords):
     nodeIdx = {}
     nodes = []
     # Make nodes from unique words
-    uniqueWords = set(wordCounts.keys() + list(seedSet))
+    uniqueWords = set(list(wordCounts.keys()) + list(seedSet))
     for idx, w in enumerate(uniqueWords):
         nodes.append(_buildNode(w, wordCounts, seedSet, finalWords))
         nodeIdx[w] = idx
@@ -109,8 +109,8 @@ def _buildNodes(wordCounts, seedSet, finalWords):
 def _metaToNetwork(results, seeds, finalVocab, yLinks):
     '''Build a network (nodes & links), using aggregated results. Network must
     be in a format usable by the front end. '''
-    wordCounts = Counter([w for res in results.values() for w, v in res])
-    seedSet = set(w for seed in seeds.values() for w in seed)
+    wordCounts = Counter([w for res in list(results.values()) for w, v in res])
+    seedSet = set(w for seed in list(seeds.values()) for w in seed)
     finalWords = [w for w, v in finalVocab]
 
     nodes, nodeIdx = _buildNodes(wordCounts, seedSet, finalWords)

@@ -2,7 +2,7 @@ import numpy as np
 
 from sortedcontainers import SortedDict
 from sklearn import manifold
-from format import wordLocationAsDict, getRangeMiddle
+from .format import wordLocationAsDict, getRangeMiddle
 
 
 def _getPairwiseDistances(wordsT1, model):
@@ -62,7 +62,7 @@ def doSpaceEmbedding(monitor, results, aggMetadata):
 
     wordsT0 = None
     locsT0 = None
-    for label, r in results.iteritems():
+    for label, r in results.items():
         model = monitor._models[label]
         wordsT1 = [w for w, _ in r]
 

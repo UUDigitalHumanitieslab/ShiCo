@@ -2,7 +2,7 @@ import gensim
 
 from shico import VocabularyMonitor as shVM
 
-from vocabularyMonitorHelper import VocabularyMonitorBase
+from .vocabularyMonitorHelper import VocabularyMonitorBase
 
 class VocabularyMonitorGensimTest(VocabularyMonitorBase):
 
@@ -21,6 +21,6 @@ class VocabularyMonitorGensimTest(VocabularyMonitorBase):
 
     def testLoadClass(self):
         '''Test models are of expected class'''
-        for label, model in self.vm._models.iteritems():
+        for label, model in self.vm._models.items():
             self.assertIsInstance(model, gensim.models.word2vec.Word2Vec,
                                   'Object should be a Word2Vec model')

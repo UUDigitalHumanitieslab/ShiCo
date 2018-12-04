@@ -16,13 +16,13 @@ class kbTokenizer:
 
         self.oPunktSentTokenizer = PunktSentenceTokenizer()
 
-        self.sNonTokenChars = (u"[‘’“”…”’“–«»\,‘\]\[;:\-\"'\?!¡¢∞§¶•ª≠∑´®†¨^π"
+        self.sNonTokenChars = ("[‘’“”…”’“–«»\,‘\]\[;:\-\"'\?!¡¢∞§¶•ª≠∑´®†¨^π"
                                "ƒ©˙∆˚¬≈√∫~⁄™‹›ﬁﬂ‡°·±—‚„‰∏”`◊ˆ~¯˘¿÷\*\(\)<>="
                                "\+#^\\\/_]+")
         self.reNonTokenChars_start = \
-            re.compile(u"(\A|\s)%s" % self.sNonTokenChars, re.U)
+            re.compile("(\A|\s)%s" % self.sNonTokenChars, re.U)
         self.reNonTokenChars_end = \
-            re.compile(u"%s(\.?(\s|\Z))" % self.sNonTokenChars, re.U)
+            re.compile("%s(\.?(\s|\Z))" % self.sNonTokenChars, re.U)
         self.reWhitespace = re.compile("\W+", re.U)
 
     def removeNonTokenChars(self, sString):
@@ -64,9 +64,9 @@ class kbTokenizer:
     def tokenizeFile(self, sFile):
         try:
             fhInput = codecs.open(sFile, mode='r', encoding='utf8')
-        except IOError, oError:
-            print >>sys.stderr, "[ERROR] Error while opening '%s'" % sFile
-            print >>sys.stderr, "[ERROR] '%s'" % oError
+        except IOError as oError:
+            print("[ERROR] Error while opening '%s'" % sFile, file=sys.stderr)
+            print("[ERROR] '%s'" % oError, file=sys.stderr)
             exit(1)
 
         sText = fhInput.read()
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     aTextTokens = oKbTokenizer.tokenizeFile(oArgs.INPUT_FILE)
 
     for aSentenceTokens in aTextTokens:
-        print "%s" % aSentenceTokens
+        print("%s" % aSentenceTokens)

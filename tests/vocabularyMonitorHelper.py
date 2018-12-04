@@ -19,12 +19,12 @@ class VocabularyMonitorBase(unittest.TestCase):
     def testModelsWork(self):
         '''Test that w2v models produce results.'''
         nItems = 5
-        for label, model in self.vm._models.iteritems():
+        for label, model in self.vm._models.items():
             wv = model.wv if hasattr(model, 'wv') else model
-            modelWords = wv.vocab.keys()
+            modelWords = list(wv.vocab.keys())
             self.assertGreater(len(modelWords), 0,
                                'Model vocabulary should have at least 1 word')
-            aWord = wv.vocab.keys()[0]
+            aWord = list(wv.vocab.keys())[0]
             items = wv.most_similar(aWord, topn=nItems)
             self.assertEqual(len(items), nItems,
                              'Model should produced %d items' % nItems)
@@ -33,8 +33,8 @@ class VocabularyMonitorBase(unittest.TestCase):
         '''Test that trackClouds produces results in the expected format.'''
         seedTerms = 'x'
         yTerms, yLinks = self.vm.trackClouds(seedTerms)
-        periods = yTerms.keys()
-        modelPeriods = self.vm._models.keys()
+        periods = list(yTerms.keys())
+        modelPeriods = list(self.vm._models.keys())
         self.assertEqual(len(yTerms), len(modelPeriods),
                          'There should be terms for every time period')
         self.assertEqual(len(yLinks), len(modelPeriods),
@@ -59,7 +59,7 @@ class VocabularyMonitorBase(unittest.TestCase):
         rNA, _ = self.vm.trackClouds(seedTerms, maxTerms=maxTerms,
                                      algorithm='non-adaptive')
 
-        for key in rIn.keys():
+        for key in list(rIn.keys()):
             self.assertEqual(len(rIn[key]), len(rNA[key]),
                              'adaptive and non-adaptive. should generate ' +
                              'equal number of results')
@@ -71,7 +71,7 @@ class VocabularyMonitorBase(unittest.TestCase):
 
         for maxTerms in nTerms:
             results, _ = self.vm.trackClouds(seedTerms, maxTerms=maxTerms)
-            for period, result in results.iteritems():
+            for period, result in results.items():
                 self.assertEqual(len(result), maxTerms,
                                  'Every period should have %d terms. %s does '
                                  'not' % (maxTerms, period))
@@ -79,7 +79,7 @@ class VocabularyMonitorBase(unittest.TestCase):
     def testTrackTermsKeys(self):
         '''Test that using range selection works.'''
         seedTerms = 'x'
-        keys = self.vm._models.keys()
+        keys = list(self.vm._models.keys())
         sKey = keys[1]
         eKey = keys[-1]
 
@@ -103,8 +103,8 @@ class VocabularyMonitorBase(unittest.TestCase):
 
         for minSim in minSims:
             _, yLinks = self.vm.trackClouds(seedTerms, minSim=minSim)
-            for links in yLinks.itervalues():
-                for seed, terms in links.iteritems():
+            for links in yLinks.values():
+                for seed, terms in links.items():
                     dists = [dist for word, dist in terms if word != seed]
                     if len(dists) > 0:
                         self.assertGreater(min(dists), minSim,
@@ -119,8 +119,8 @@ class VocabularyMonitorBase(unittest.TestCase):
         seedTerms = ['x']
 
         _, yLinks = self.vm.trackClouds(seedTerms, algorithm='non-adaptive')
-        for period, links in yLinks.iteritems():
-            self.assertEqual(seedTerms, links.keys(),
+        for period, links in yLinks.items():
+            self.assertEqual(seedTerms, list(links.keys()),
                              'Seeds used should remain constant for all '
                              'periods but they differ for period %s' % period)
 
@@ -133,7 +133,7 @@ class VocabularyMonitorBase(unittest.TestCase):
 
         periods = list(yTerms.keys())   # T
         for n in range(1, len(periods)):
-            seedsTn = yLinks[periods[n]].keys()
+            seedsTn = list(yLinks[periods[n]].keys())
             termsTn_1 = [w for w, _ in yTerms[periods[n - 1]]]
             # Compare seeds of T[n] vs terms of T[n-1],'
             self.assertEqual(sorted(termsTn_1), sorted(seedsTn),
@@ -145,7 +145,7 @@ class VocabularyMonitorBase(unittest.TestCase):
         seedTerms = 'x'
         yTerms, _ = self.vm.trackClouds(seedTerms)
 
-        for period, result in yTerms.iteritems():
+        for period, result in yTerms.items():
             for pair in result:
                 self.assertEqual(len(pair), 2,
                                  'Results should be word,score tuples')
@@ -161,10 +161,10 @@ class VocabularyMonitorBase(unittest.TestCase):
         seedTerms = 'x'
         _, yLinks = self.vm.trackClouds(seedTerms)
 
-        for period, links in yLinks.iteritems():
+        for period, links in yLinks.items():
             self.assertTrue(isinstance(links, dict),
                             'Should contain a dictionary')
-            for seed, terms in links.iteritems():
+            for seed, terms in links.items():
                 self.assertTrue(isinstance(seed, six.string_types),
                                 'Seed should be a string')
                 for pair in terms:
