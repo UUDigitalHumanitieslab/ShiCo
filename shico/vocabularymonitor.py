@@ -6,7 +6,7 @@ from gensim.models import KeyedVectors
 
 from sortedcontainers import SortedDict
 from collections import defaultdict, Counter
-from functools32 import lru_cache
+from functools import lru_cache
 
 
 class VocabularyMonitor():
