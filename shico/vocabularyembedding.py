@@ -52,7 +52,7 @@ def _findTransform(wordsT0, locsT0, wordsT1, locsT1):
     F0 = np.array(F0)
     F1 = np.array(F1)
 
-    T, residuals, rank, s = np.linalg.lstsq(F1, F0)
+    T, residuals, rank, s = np.linalg.lstsq(F1, F0, rcond=-1)
     return T
 
 
