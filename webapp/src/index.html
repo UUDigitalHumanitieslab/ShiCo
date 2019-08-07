@@ -26,9 +26,11 @@
 
     <div class="container" ng-controller="FormController as vm" cg-busy="vm.trackerPromise">
       <div class="jumbotron">
-        <img src="assets/logos/escience2.png" height="60">
-        <img src="assets/logos/UU-logo2011-en.png" height="42">
-        <img src="assets/logos/dighum-logo.svg" height="30">
+        <div class="box" style="display:flex; justify-content:space-between;">
+            <img src="assets/logos/UU-logo2011-en.png" height="42">
+            <img src="assets/logos/escience2.png" height="60">
+            <img src="assets/logos/dighum-logo.svg" height="30">
+        </div>
         <h4>This shifting concepts viewer uses 10-year models built from the National Library of the Netherlands (KB) newspaper archive (1840-1920), based on newspapers which appeared in the Netherlands.</h4>
         <form ng-submit="vm.doPost()">
           <tracker-parameters></tracker-parameters>

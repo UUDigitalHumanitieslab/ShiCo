@@ -12,3 +12,8 @@
 .thumbnail img.pull-right {
   width: 50px;
 }
+
+.box {
+  display: flex;
+  justify-content: space-between;
+}
