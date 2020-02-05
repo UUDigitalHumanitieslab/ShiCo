@@ -24,6 +24,7 @@ from shico.vocabularyembedding import doSpaceEmbedding
 from shico.format import yearlyNetwork, getRangeMiddle, yearTuplesAsDict
 from shico.server.utils import initApp
 
+import logging
 
 app = Flask(__name__)
 CORS(app)
@@ -98,4 +99,5 @@ if __name__ == "__main__":
                 w2vFormat, cleaningFunctionStr)
 
     app.debug = arguments['-d']
+    logging.basicConfig(level=config.LOG_LEVEL)
     app.run(host='0.0.0.0')
