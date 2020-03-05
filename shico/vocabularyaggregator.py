@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 import six
 from sortedcontainers import SortedDict
 from collections import defaultdict
@@ -29,6 +32,7 @@ class VocabularyAggregator():
     def __init__(self, weighF='Gaussian', wfParam=10,
                  yearsInInterval=5, nWordsPerYear=10, yIntervalFreq=None):
         '''Create a VocabularyAggregator.'''
+        logger.debug('enter %s.%s.__init__', __name__, self.__class__.__name__)
         if yIntervalFreq is None:
             yIntervalFreq = yearsInInterval
         self._weighF = weighF
@@ -36,6 +40,7 @@ class VocabularyAggregator():
         self._yearsInInterval = yearsInInterval
         self._nWordsPerYear = nWordsPerYear
         self._yIntervalFreq = yIntervalFreq
+        logger.debug('exit %s.%s.__init__', __name__, self.__class__.__name__)
 
     def aggregate(self, vocab):
         '''Apply the aggregation algorithm to the given vocabulary with the
@@ -57,9 +62,11 @@ class VocabularyAggregator():
               '1958': ['1953_1962', '1954_1963', '1955_1964']
             }
         '''
+        logger.debug('enter %s.%s.aggregate', __name__, self.__class__.__name__)
         # If vocab is shorter than _yearsInInterval, use all years in vocab
         # in a single interval.
         yrInInterval = min(self._yearsInInterval, len(vocab))
+        logger.debug('exit %s.%s.aggregate', __name__, self.__class__.__name__)
         return _adaptiveAggregation(vocab, n=self._nWordsPerYear,
                                     yIntervals=yrInInterval,
                                     weightF=self._weighF,
@@ -71,6 +78,7 @@ def _adaptiveAggregation(V, n, yIntervals, weightF, param, freq):
     '''Apply adaptive aggregation algorithm to the given vocabulary.
     Algorithm 2 from paper.
     '''
+    logger.debug('enter %s._adaptiveAggregation', __name__)
     # Initialize returned parameters
     finalVocabs = SortedDict()
     periodGroups = SortedDict()
@@ -95,6 +103,7 @@ def _adaptiveAggregation(V, n, yIntervals, weightF, param, freq):
 
         finalVocabs[str(int(mu_t))] = topN
         periodGroups[str(int(mu_t))] = t
+    logger.debug('exit %s._adaptiveAggregation', __name__)
     return finalVocabs, periodGroups
 
 
@@ -103,6 +112,7 @@ def _selectWeightingFunction(weightF, param):
     the given parameter param. Returns a function which takes two
     years as inputs: F(Y1, Y2).
     '''
+    logger.debug('enter %s._selectWeightingFunction', __name__)
     if weightF == 'Gaussian':
         def f(y1, y2): return weightGauss(y1, y2, param)
     elif weightF == 'JSD':
@@ -112,7 +122,9 @@ def _selectWeightingFunction(weightF, param):
     elif six.callable(weightF):
         f = weightF
     else:
+        logger.debug('exit %s._selectWeightingFunction', __name__)
         raise Exception('Unknown weighting function: ' + weightF)
+    logger.debug('exit %s._selectWeightingFunction', __name__)
     return f
 
 
@@ -135,5 +147,7 @@ def _arrangeIntervals(vocabs, nYears, freq):
     freq
     yIntervalFreq   -- Spacing between group periods.
     '''
+    logger.debug('enter %s._arrangeIntervals', __name__)
     keys = list(vocabs.keys())
+    logger.debug('exit %s._arrangeIntervals', __name__)
     return [keys[i:i + nYears] for i in range(0, 1 + len(keys) - nYears, freq)]

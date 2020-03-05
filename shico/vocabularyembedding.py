@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 import numpy as np
 
 from sortedcontainers import SortedDict
@@ -6,6 +9,7 @@ from .format import wordLocationAsDict, getRangeMiddle
 
 
 def _getPairwiseDistances(wordsT1, model):
+    logger.debug('enter %s._getPairwiseDistances', __name__)
     dists = np.zeros((len(wordsT1), len(wordsT1)))
     for i, w1 in enumerate(wordsT1):
         for j, w2 in enumerate(wordsT1[i:]):
@@ -16,30 +20,37 @@ def _getPairwiseDistances(wordsT1, model):
                 # as dissimilar as possible
                 dists[i, i+j] = 1
             dists[i+j, i] = dists[i, i+j]
+    logger.debug('exit %s._getPairwiseDistances', __name__)
     return dists
 
 
 def _getMDSEmbedding(dists):
+    logger.debug('enter %s._getMDSEmbedding', __name__)
     seed = np.random.RandomState(seed=3)
     mds = manifold.MDS(n_components=2, max_iter=3000, eps=1e-9, random_state=seed,
                        dissimilarity="precomputed", n_jobs=1)
     xyEmbedding = mds.fit(dists).embedding_
+    logger.debug('exit %s._getMDSEmbedding', __name__)
     return xyEmbedding
 
 
 def _normalizeCloud(X):
+    logger.debug('enter %s._normalizeCloud', __name__)
     X -= X.min(axis=0)
     X /= X.max(axis=0)
     X -= X.mean(axis=0)
+    logger.debug('exit %s._normalizeCloud', __name__)
     return X
 
 
 def _findTransform(wordsT0, locsT0, wordsT1, locsT1):
+    logger.debug('enter %s._findTransform', __name__)
     matchingTerms = list(set(wordsT0).intersection(set(wordsT1)))
 
     # If we don't have any matching terms -- do not transform
     # (or transform by identity matrix)
     if len(matchingTerms) == 0:
+        logger.debug('exit %s._findTransform', __name__)
         return np.eye(2)
 
     F0 = []
@@ -53,11 +64,13 @@ def _findTransform(wordsT0, locsT0, wordsT1, locsT1):
     F1 = np.array(F1)
 
     T, residuals, rank, s = np.linalg.lstsq(F1, F0, rcond=-1)
+    logger.debug('exit %s._findTransform', __name__)
     return T
 
 
 def doSpaceEmbedding(monitor, results, aggMetadata):
     '''Create 2D word embedding from given set of results'''
+    logger.debug('enter %s.doSpaceEmbedding', __name__)
     embeddedResults = SortedDict()
 
     wordsT0 = None
@@ -85,4 +98,5 @@ def doSpaceEmbedding(monitor, results, aggMetadata):
     embeddedResultsAgg = {year: embeddedResults[year] for year in aggMetadata if year in embeddedResults}
     embeddedResultsAgg = SortedDict(embeddedResultsAgg)
 
+    logger.debug('exit %s.doSpaceEmbedding', __name__)
     return embeddedResultsAgg

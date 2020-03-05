@@ -33,6 +33,7 @@ CORS(app)
 def appData():
     '''VocabularyMonitor.getAvailableYears service. Takes no parameters.
     Returns JSON structure with years available.'''
+    app.logger.debug('enter %s.appData', __name__)
     avlYears = app.config['vm'].getAvailableYears()
     yearLabels = {int(getRangeMiddle(y)): y for y in avlYears}
     years = {
@@ -41,6 +42,7 @@ def appData():
         'last': max(yearLabels.keys())
     }
     canClean = app.config['cleaningFunction'] is not None
+    app.logger.debug('exit %s.appData', __name__)
     return jsonify(years=years, cleaning=canClean)
 
 
@@ -49,6 +51,7 @@ def trackWord(terms):
     '''VocabularyMonitor.trackClouds service. Expects a list of terms to be
     sent to the Vocabulary monitor, and returns a JSON representation of the
     response.'''
+    app.logger.debug('enter %s.trackWord', __name__)
     params = app.config['trackParser'].parse_args()
     termList = terms.split(',')
     termList = [term.strip() for term in termList]
@@ -78,6 +81,7 @@ def trackWord(terms):
     stream = yearTuplesAsDict(aggResults)
     networks = yearlyNetwork(aggMetadata, aggResults, results, links)
     embedded = doSpaceEmbedding(app.config['vm'], results, aggMetadata)
+    app.logger.debug('exit %s.trackWord', __name__)
     return jsonify(stream=stream,
                    networks=networks,
                    embedded=embedded,

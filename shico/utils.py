@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 import numpy as np
 import scipy.stats as ss
 
@@ -11,6 +14,7 @@ def weightJSD(Y1, Y2, offsetY=10):
     Y1,Y2        Years whose similarity we want to calculate.
     offsetY      Width of margin on time window.
     '''
+    logger.debug('enter %s.weightJSD', __name__)
     # Time window covers both target years, plus some margin
     minY = min(Y1, Y2) - offsetY
     maxY = max(Y1, Y2) + offsetY
@@ -20,6 +24,7 @@ def weightJSD(Y1, Y2, offsetY=10):
     q = ss.norm.pdf(t, loc=Y2, scale=1)
     # Joint distribution
     m = 0.5 * (p + q)
+    logger.debug('exit %s.weightJSD', __name__)
     return 1 - max(0.5 * (ss.entropy(p, m) + ss.entropy(q, m)), 0)
 
 
@@ -33,7 +38,9 @@ def weightGauss(Y1, Y2, c=10):
     c            This parameter controls the shape of the gaussian. Higher
                  values cause slower decay.
     '''
+    logger.debug('enter %s.weightGauss', __name__)
     x = Y1 - Y2
+    logger.debug('exit %s.weightGauss', __name__)
     return (np.exp(-(x ** 2) / c))
 
 
@@ -47,4 +54,5 @@ def weightLinear(Y1, Y2, a=10):
     a            This parameter controls the speed of decay. Higher values
                  cause slower decay.
     '''
+    logger.debug('touch %s.weightLinear', __name__)
     return max(1 - abs(Y2 - Y1) / a, 0)

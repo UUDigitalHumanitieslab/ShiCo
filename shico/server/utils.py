@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 from flask_restful import reqparse
 from shico.server.validations import validatestr, validAlgorithm, validWeighting, validDirection, sumSimilarity, validCleaning
 
@@ -6,6 +9,7 @@ from shico.vocabularymonitor import VocabularyMonitor
 
 def initParamParser():
     # VocabularyMonitor parameters:
+    logger.debug('enter %s.initParamParser', __name__)
     trackParser = reqparse.RequestParser()
     trackParser.add_argument('maxTerms', type=int, default=10)
     trackParser.add_argument('maxRelatedTerms', type=int, default=10)
@@ -26,6 +30,7 @@ def initParamParser():
     trackParser.add_argument('aggYearsInInterval', type=int, default=5)
     trackParser.add_argument('aggWordsPerYear', type=int, default=10)
 
+    logger.debug('exit %s.initParamParser', __name__)
     return trackParser
 
 
@@ -39,6 +44,7 @@ def initApp(app, files, binary, useMmap, w2vFormat, cleaningFunctionStr):
     w2vFormat ???
     cleaningFunctionStr   ???
     '''
+    logger.debug('enter %s.initApp', __name__)
     # TODO: 'Add use cache on initApp'
     vm = VocabularyMonitor(files, binary=binary,
                            useMmap=useMmap, w2vFormat=w2vFormat)
@@ -48,14 +54,18 @@ def initApp(app, files, binary, useMmap, w2vFormat, cleaningFunctionStr):
     app.config['vm'] = vm
     app.config['cleaningFunction'] = cleaningFunction
     app.config['trackParser'] = trackParser
+    logger.debug('exit %s.initApp', __name__)
 
 
 def _getCallableFunction(functionFullName):
     ''' TODO: Add documentation '''
+    logger.debug('enter %s._getCallableFunction', __name__)
     if functionFullName is None:
+        logger.debug('exit %s._getCallableFunction', __name__)
         return None
     nameParts = functionFullName.split('.')
     moduleName = '.'.join(nameParts[:-1])
     functionName = nameParts[-1]
     customModule = __import__(moduleName, fromlist=[functionName])
+    logger.debug('exit %s._getCallableFunction', __name__)
     return getattr(customModule, functionName)

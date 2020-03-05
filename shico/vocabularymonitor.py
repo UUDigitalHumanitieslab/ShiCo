@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 import glob
 import os
 import six
@@ -33,14 +36,17 @@ class VocabularyMonitor():
         useMmap         ???
         w2vFormat       ???
         '''
+        logger.debug('enter %s.%s.__init__', __name__, self.__class__.__name__)
         self._models = SortedDict()
         self._loadAllModels(globPattern, binary=True, useCache=useCache,
                             useMmap=useMmap, w2vFormat=w2vFormat)
+        logger.debug('exit %s.%s.__init__', __name__, self.__class__.__name__)
 
     def _loadAllModels(self, globPattern, binary, useCache, useMmap, w2vFormat):
         '''Load word2vec models from given globPattern and return a dictionary
         of Word2Vec models.
         '''
+        logger.debug('enter %s.%s._loadAllModels', __name__, self.__class__.__name__)
         for sModelFile in glob.glob(globPattern):
             # Chop off the path and the extension
             sModelName = os.path.splitext(os.path.basename(sModelFile))[0]
@@ -61,10 +67,12 @@ class VocabularyMonitor():
                 print('...caching model ', sModelName)
                 self._models[sModelName] = CachedW2VModelEvaluator(
                     self._models[sModelName])
+        logger.debug('exit %s.%s._loadAllModels', __name__, self.__class__.__name__)
 
     def getAvailableYears(self):
         '''Returns a list of year key's of w2v models currently loaded on this
         vocabularymonitor.'''
+        logger.debug('touch %s.%s.getAvailableYears', __name__, self.__class__.__name__)
         return list(self._models.keys())
 
     def trackClouds(self, seedTerms, maxTerms=10, maxRelatedTerms=10,
@@ -120,6 +128,7 @@ class VocabularyMonitor():
                             }
                   }
         '''
+        logger.debug('enter %s.%s.trackClouds', __name__, self.__class__.__name__)
         if isinstance(seedTerms, six.string_types):
             seedTerms = [seedTerms]
         aSeedSet = seedTerms
@@ -134,12 +143,14 @@ class VocabularyMonitor():
         # Select starting key
         if (startKey is not None):
             if startKey not in sortedKeys:
+                logger.debug('exit %s.%s.trackClouds', __name__, self.__class__.__name__)
                 raise KeyError('Key ' + startKey + ' not a valid model index')
             keyIdx = sortedKeys.index(startKey)
             sortedKeys = sortedKeys[keyIdx:]
         # Select end key
         if (endKey is not None):
             if endKey not in sortedKeys:
+                logger.debug('exit %s.%s.trackClouds', __name__, self.__class__.__name__)
                 raise KeyError('Key ' + endKey + ' not a valid model index')
             keyIdx = sortedKeys.index(endKey)
             sortedKeys = sortedKeys[:keyIdx]
@@ -168,18 +179,21 @@ class VocabularyMonitor():
                                     minSim=minSim,
                                     cleaningFunction=cleaningFunction)
             else:
+                logger.debug('exit %s.%s.trackClouds', __name__, self.__class__.__name__)
                 raise Exception('Algorithm not supported: ' + algorithm)
 
             # Store results of this time period
             yTerms[sKey] = terms
             yLinks[sKey] = links
 
+        logger.debug('exit %s.%s.trackClouds', __name__, self.__class__.__name__)
         return yTerms, yLinks
 
     def _trackInlink(self, model, seedTerms, maxTerms=10, maxRelatedTerms=10,
                      minSim=0.0, wordBoost=1.0, sumSimilarity=False,
                      cleaningFunction=None):
         '''Perform in link search'''
+        logger.debug('enter %s.%s._trackInlink', __name__, self.__class__.__name__)
         if sumSimilarity:
             terms, links = self._trackCore(
                 model, seedTerms, maxTerms=maxTerms,
@@ -193,6 +207,7 @@ class VocabularyMonitor():
                 cleaningFunction=cleaningFunction)
         # Make a new seed set
         newSeedSet = [word for word, weight in terms]
+        logger.debug('exit %s.%s._trackInlink', __name__, self.__class__.__name__)
         return terms, links, newSeedSet
 
     def _trackCore(self, model, seedTerms, maxTerms=10, maxRelatedTerms=10,
@@ -201,6 +216,7 @@ class VocabularyMonitor():
         '''Given a list of seed terms, queries the given model to produce a
         list of terms. A dictionary of links is also returned as a dictionary:
         { seed: [(word,weight),...]}'''
+        logger.debug('enter %s.%s._trackCore', __name__, self.__class__.__name__)
         dRelatedTerms = defaultdict(float)
         links = defaultdict(list)
 
@@ -225,10 +241,12 @@ class VocabularyMonitor():
         selectedTerms = set(word for word, weight in topTerms)
         links = {seed: _pruned(pairs, selectedTerms)
                  for seed, pairs in links.items()}
+        logger.debug('exit %s.%s._trackCore', __name__, self.__class__.__name__)
         return topTerms, links
 
 
 def _getRelatedTerms(model, seedTerms, maxRelatedTerms, cleaningFunction):
+    logger.debug('enter %s._getRelatedTerms', __name__)
     queries = []
     threads = []
 
@@ -241,11 +259,13 @@ def _getRelatedTerms(model, seedTerms, maxRelatedTerms, cleaningFunction):
     for t in threads:
         t.join()
     queries.sort()
+    logger.debug('exit %s._getRelatedTerms', __name__)
     return queries
 
 
 def _getRelatedTermsThread(model, term, maxRelatedTerms, queries,
                            cleaningFunction):
+    logger.debug('enter %s._getRelatedTermsThread', __name__)
     try:
         newTerms = model.most_similar(term, topn=maxRelatedTerms)
         if cleaningFunction is not None:
@@ -256,11 +276,13 @@ def _getRelatedTermsThread(model, term, maxRelatedTerms, queries,
     except KeyError:
         queries.append((term, []))
         pass
+    logger.debug('exit %s._getRelatedTermsThread', __name__)
 
 
 def _pruned(pairs, words):
     '''Returns a list of (word, weight) tuples which is the same as the given
     list (pairs), except containing only words in the set (words)'''
+    logger.debug('touch %s._pruned', __name__)
     return [(word, weight) for word, weight in pairs if word in words]
 
 
@@ -268,8 +290,10 @@ def _getCommonTerms(terms, N):
     '''Return a the top N terms of the given list. Terms are given as a
     dictionary of { term: weight } and the top terms are the terms with the
     highest weights.'''
+    logger.debug('enter %s._getCommonTerms', __name__)
     termCounter = Counter(terms)
     topTerms = termCounter.most_common(N)
+    logger.debug('exit %s._getCommonTerms', __name__)
     return topTerms
 
 
@@ -279,15 +303,21 @@ class CachedW2VModelEvaluator():
     results from each model cached, making querying much faster.'''
 
     def __init__(self, model):
+        logger.debug('enter %s.%s.__init__', __name__, self.__class__.__name__)
         self._model = model
         self.vocab = model.vocab
+        logger.debug('exit %s.%s.__init__', __name__, self.__class__.__name__)
 
     @lru_cache(maxsize=1000)
     def most_similar(self, term, topn):
+        logger.debug('touch %s.%s.most_similar', __name__, self.__class__.__name__)
         return self._model.most_similar(term, topn=topn)
 
     def n_similarity(self, term1, term2):
+        logger.debug('enter %s.%s.n_similarity', __name__, self.__class__.__name__)
         try:
+            logger.debug('exit %s.%s.n_similarity', __name__, self.__class__.__name__)
             return self._model.n_similarity(term1, term2)
         except KeyError:
+            logger.debug('exit %s.%s.n_similarity', __name__, self.__class__.__name__)
             return 0
