@@ -53,9 +53,13 @@ def trackWord(terms):
     response.'''
     app.logger.debug('enter %s.trackWord', __name__)
     params = app.config['trackParser'].parse_args()
+    app.logger.debug('a')
     termList = terms.split(',')
+    app.logger.debug('b')
     termList = [term.strip() for term in termList]
+    app.logger.debug('c')
     termList = [term.lower() for term in termList]
+    app.logger.debug('d')
     results, links = \
         app.config['vm'].trackClouds(termList, maxTerms=params['maxTerms'],
                                      maxRelatedTerms=params['maxRelatedTerms'],
@@ -69,17 +73,24 @@ def trackWord(terms):
                                      cleaningFunction=app.config['cleaningFunction'] if params[
             'doCleaning'] else None
         )
+    app.logger.debug('e')
     agg = VocabularyAggregator(weighF=params['aggWeighFunction'],
                                wfParam=params['aggWFParam'],
                                yearsInInterval=params['aggYearsInInterval'],
                                nWordsPerYear=params['aggWordsPerYear']
                                )
 
+    app.logger.debug('f')
     aggResults, aggMetadata = agg.aggregate(results)
+    app.logger.debug('g')
     print("ResKeys", list(results.keys()))
+    app.logger.debug('h')
     print("AggResKeys", list(aggResults.keys()))
+    app.logger.debug('i')
     stream = yearTuplesAsDict(aggResults)
+    app.logger.debug('j')
     networks = yearlyNetwork(aggMetadata, aggResults, results, links)
+    app.logger.debug('k')
     embedded = doSpaceEmbedding(app.config['vm'], results, aggMetadata)
     app.logger.debug('exit %s.trackWord', __name__)
     return jsonify(stream=stream,
